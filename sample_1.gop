@@ -1,0 +1,42 @@
+1 + 2 * 3 / 4 - (10 + 15)
+
+x := "world"
+y := "Hello, $x"
+z := string.format("Hello, {}", x)
+a := "hello, " + "world" + "!"
+
+///
+
+x string := "hello"
+x = "world"
+
+y string := _
+
+
+///
+
+stringList List<String> := _
+
+type List<T> struct {
+    items []T
+}
+
+
+///
+
+
+
+func max<T>(a T, b T) T {
+    return a > b ? a : b
+}
+
+////
+
+
+if condition {
+    do a
+} else if otherCondition {
+    do b
+} else {
+    do c
+}
