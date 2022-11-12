@@ -200,36 +200,10 @@ func (lexer *Lexer) Next() (Token, error) {
 			Col:      lexer.source.col,
 			Line:     lexer.source.line,
 			Found:    string(lexer.source.Peek()),
-			Expected: "a token",
+			Expected: "expression",
 		}
 	}
 }
-
-/**
-
-enum Token {
-	Number(int),
-	Literal(string),
-	EOF,
-	Pointer {
-		type: string,
-		addr: uint
-	}
-}
-
-number := Token.Number(32)
-lit := Token.String("hello")
-eof := Token.EOF
-
-match number {
-	Number(num) => println("number is $num"),
-	...
-}
-
-
-
-
-*/
 
 func main() {
 
