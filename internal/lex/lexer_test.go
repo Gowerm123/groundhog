@@ -1,28 +1,27 @@
-package lexer
+package lex
 
 import (
-	"awesomeProject/internal/tokens"
 	"fmt"
 	"testing"
 )
 
 func TestLexExpr1(t *testing.T) {
 	lexer := NewLexer(NewSource("1 + 21 *3/4 - (10+ 15)"))
-	expected := []tokens.Token{
-		{TokenType: tokens.TOKEN_TYPE_NUMBER, Text: "1"},
-		{TokenType: tokens.TOKEN_TYPE_OP, Text: "+"},
-		{TokenType: tokens.TOKEN_TYPE_NUMBER, Text: "21"},
-		{TokenType: tokens.TOKEN_TYPE_OP, Text: "*"},
-		{TokenType: tokens.TOKEN_TYPE_NUMBER, Text: "3"},
-		{TokenType: tokens.TOKEN_TYPE_OP, Text: "/"},
-		{TokenType: tokens.TOKEN_TYPE_NUMBER, Text: "4"},
-		{TokenType: tokens.TOKEN_TYPE_OP, Text: "-"},
-		{TokenType: tokens.TOKEN_TYPE_START_EXPR},
-		{TokenType: tokens.TOKEN_TYPE_NUMBER, Text: "10"},
-		{TokenType: tokens.TOKEN_TYPE_OP, Text: "+"},
-		{TokenType: tokens.TOKEN_TYPE_NUMBER, Text: "15"},
-		{TokenType: tokens.TOKEN_TYPE_END_EXPR},
-		{TokenType: tokens.TOKEN_TYPE_EOF},
+	expected := []Token{
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "1"},
+		{TokenType: TOKEN_TYPE_OP, Text: "+"},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "21"},
+		{TokenType: TOKEN_TYPE_OP, Text: "*"},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "3"},
+		{TokenType: TOKEN_TYPE_OP, Text: "/"},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "4"},
+		{TokenType: TOKEN_TYPE_OP, Text: "-"},
+		{TokenType: TOKEN_TYPE_LPAREN},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "10"},
+		{TokenType: TOKEN_TYPE_OP, Text: "+"},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "15"},
+		{TokenType: TOKEN_TYPE_RPAREN},
+		{TokenType: TOKEN_TYPE_EOF},
 	}
 
 	for _, check := range expected {

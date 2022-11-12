@@ -1,23 +1,23 @@
 package main
 
 import (
-	"awesomeProject/internal/lexer"
-	"awesomeProject/internal/parser"
-	"awesomeProject/internal/tokens"
+	"awesomeProject/internal/eval"
+	"awesomeProject/internal/lex"
+	"awesomeProject/internal/parse"
+	"awesomeProject/internal/printer"
 	"fmt"
 )
 
 func main() {
-	text := "1 * 2 + 3"
-	lexer := lexer.NewLexer(lexer.NewSource(text))
-	exprBuff := []tokens.Token{}
-	for token, err := lexer.Next(); token.TokenType != tokens.TOKEN_TYPE_EOF && err == nil; token, err = lexer.Next() {
-		exprBuff = append(exprBuff, token)
+	text := "3 + 4 - 5 + 6 * 2"
+	lexer := lex.NewLexer(lex.NewSource(text))
+
+	ast, err := parse.Parse(&lexer)
+	if err != nil {
+		panic(err)
 	}
 
-	parsed := parser.ParseExpression(exprBuff)
-
-	for _, k := range parsed {
-		fmt.Println(k)
-	}
+	println(printer.String(&ast))
+	println(fmt.Sprintf("= %d", eval.EvalExpression(&ast)))
+	println(fmt.Sprintf("= %d", 3+4-5+6*2))
 }
