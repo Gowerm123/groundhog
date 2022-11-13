@@ -23,6 +23,10 @@ func (s *stringer) VisitBinop(parent *parse.Node, op *parse.Node) {
 	s.buf.WriteRune(')')
 }
 
+func (s *stringer) VisitUnop(parent *parse.Node, op *parse.Node) {
+	
+}
+
 func String(node *parse.Node) string {
 	var toString stringer
 	node.Visit(nil, &toString)

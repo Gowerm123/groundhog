@@ -10,6 +10,7 @@ type NodeType uint8
 const (
 	NODE_TYPE_NUMBER = iota
 	NODE_TYPE_BINOP
+	NODE_TYPE_UNOP
 )
 
 type Node struct {
@@ -21,6 +22,7 @@ type Node struct {
 type NodeVisitor interface {
 	VisitNumber(parent *Node, number *Node)
 	VisitBinop(parent *Node, op *Node)
+	VisitUnop(parent *Node, op *Node)
 }
 
 func (n *Node) Visit(parent *Node, visitor NodeVisitor) {
@@ -29,6 +31,8 @@ func (n *Node) Visit(parent *Node, visitor NodeVisitor) {
 		visitor.VisitNumber(parent, n)
 	case NODE_TYPE_BINOP:
 		visitor.VisitBinop(parent, n)
+	case NODE_TYPE_UNOP:
+		visitor.VisitUnop(parent, n)
 	default:
 		panic(fmt.Sprintf("Node.Visit(...) => Forgot node type case %d", n.NodeType))
 	}
@@ -104,15 +108,17 @@ func ParseExpression(lexer *lex.Lexer) (Node, error) {
 		case lex.TOKEN_TYPE_NUMBER:
 			push(&outQueue, token)
 		case lex.TOKEN_TYPE_OP:
-			for len(opStack) > 0 && OperatorPrecedence(peekStack(opStack).Text) >= OperatorPrecedence(token.Text) {
+			for len(opStack) > 0 && OperatorPrecedence(peekStack(opStack).Text) >= OperatorPrecedence(token.Text) && peekStack(opStack).Text != "(" {
 				op := popStack(&opStack)
 				push(&outQueue, op)
 			}
 			push(&opStack, token)
 		case lex.TOKEN_TYPE_LPAREN:
 			push(&opStack, token)
+			fmt.Println("LENFTH OF OPSTACK", len(opStack))
 		case lex.TOKEN_TYPE_RPAREN:
 			for peekStack(opStack).Text != "(" {
+				println(len(opStack), peekStack(opStack).Text)
 				op := popStack(&opStack)
 				push(&outQueue, op)
 			}
@@ -153,24 +159,32 @@ func ParseExpression(lexer *lex.Lexer) (Node, error) {
 		case lex.TOKEN_TYPE_OP:
 			//only binary operators right now
 			if len(nodeStack) < 2 {
-				return Node{}, ExprError{
-					Found:   token,
-					Message: "Unable to parse expression",
+				switch token.Text {
+				case "++", "--", "**":
+					child := nodeStack[len(nodeStack)-1]
+					nodeStack = nodeStack[:len(nodeStack)-1]
+					nodeStack = append(nodeStack, Node{
+						NodeType: NODE_TYPE_UNOP,
+						Children: []Node{child},
+						Token:    token,
+					})
 				}
+			} else {
+
+				//pop 2 off of end
+				children := append([]Node(nil), nodeStack[len(nodeStack)-2:]...)
+				nodeStack = nodeStack[0 : len(nodeStack)-2]
+
+				nodeStack = append(nodeStack, Node{
+					NodeType: NODE_TYPE_BINOP,
+					Children: children,
+					Token:    token,
+				})
 			}
-
-			//pop 2 off of end
-			children := append([]Node(nil), nodeStack[len(nodeStack)-2:]...)
-			nodeStack = nodeStack[0 : len(nodeStack)-2]
-
-			nodeStack = append(nodeStack, Node{
-				NodeType: NODE_TYPE_BINOP,
-				Children: children,
-				Token:    token,
-			})
 		default:
 			panic("Unused case in convert opstack to node")
 		}
+
 	}
 
 	if len(nodeStack) != 1 {

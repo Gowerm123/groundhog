@@ -37,6 +37,17 @@ func (e *eval) VisitBinop(parent *parse.Node, op *parse.Node) {
 	}
 }
 
+func (e *eval) VisitUnop(parent *parse.Node, op *parse.Node) {
+	child := EvalExpression(&op.Children[0])
+	fmt.Println("HERE")
+	switch op.Token.Text {
+	case "++":
+		e.result = child + 1
+	case "--":
+		e.result = child - 1
+	}
+}
+
 func EvalExpression(expr *parse.Node) int {
 	var eval eval
 	expr.Visit(nil, &eval)
