@@ -1,7 +1,7 @@
 package eval
 
 import (
-	"awesomeProject/internal/parse"
+	"awesomeProject/internal/ast"
 	"fmt"
 	"strconv"
 )
@@ -10,7 +10,7 @@ type eval struct {
 	result int
 }
 
-func (e *eval) VisitNumber(parent *parse.Node, number *parse.Node) {
+func (e *eval) VisitNumber(parent *ast.Node, number *ast.Node) {
 	result, err := strconv.ParseInt(number.Token.Text, 10, 32)
 	if err != nil {
 		panic(err)
@@ -19,7 +19,7 @@ func (e *eval) VisitNumber(parent *parse.Node, number *parse.Node) {
 	e.result = int(result)
 }
 
-func (e *eval) VisitBinop(parent *parse.Node, op *parse.Node) {
+func (e *eval) VisitBinop(parent *ast.Node, op *ast.Node) {
 	left := EvalExpression(&op.Children[0])
 	right := EvalExpression(&op.Children[1])
 
@@ -37,7 +37,7 @@ func (e *eval) VisitBinop(parent *parse.Node, op *parse.Node) {
 	}
 }
 
-func (e *eval) VisitUnop(parent *parse.Node, op *parse.Node) {
+func (e *eval) VisitUnop(parent *ast.Node, op *ast.Node) {
 	child := EvalExpression(&op.Children[0])
 	fmt.Println("HERE")
 	switch op.Token.Text {
@@ -48,7 +48,7 @@ func (e *eval) VisitUnop(parent *parse.Node, op *parse.Node) {
 	}
 }
 
-func EvalExpression(expr *parse.Node) int {
+func EvalExpression(expr *ast.Node) int {
 	var eval eval
 	expr.Visit(nil, &eval)
 

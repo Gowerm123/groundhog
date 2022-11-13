@@ -1,42 +1,10 @@
 package parse
 
 import (
+	"awesomeProject/internal/ast"
 	"awesomeProject/internal/lex"
 	"fmt"
 )
-
-type NodeType uint8
-
-const (
-	NODE_TYPE_NUMBER = iota
-	NODE_TYPE_BINOP
-	NODE_TYPE_UNOP
-)
-
-type Node struct {
-	NodeType NodeType
-	Children []Node
-	Token    lex.Token
-}
-
-type NodeVisitor interface {
-	VisitNumber(parent *Node, number *Node)
-	VisitBinop(parent *Node, op *Node)
-	VisitUnop(parent *Node, op *Node)
-}
-
-func (n *Node) Visit(parent *Node, visitor NodeVisitor) {
-	switch n.NodeType {
-	case NODE_TYPE_NUMBER:
-		visitor.VisitNumber(parent, n)
-	case NODE_TYPE_BINOP:
-		visitor.VisitBinop(parent, n)
-	case NODE_TYPE_UNOP:
-		visitor.VisitUnop(parent, n)
-	default:
-		panic(fmt.Sprintf("Node.Visit(...) => Forgot node type case %d", n.NodeType))
-	}
-}
 
 type Error struct {
 	//Parent   *Node
@@ -57,7 +25,7 @@ func (p ExprError) Error() string {
 	return fmt.Sprintf("%s on line %d", p.Message, p.Found.Line)
 }
 
-func Parse(lexer *lex.Lexer) (Node, error) {
+func Parse(lexer *lex.Lexer) (ast.Node, error) {
 	return ParseExpression(lexer)
 }
 
@@ -95,12 +63,12 @@ func nextToken(lexer *lex.Lexer, expected []lex.TokenType) (lex.Token, error) {
 	return lexer.Next()
 }
 
-func ParseExpression(lexer *lex.Lexer) (Node, error) {
+func ParseExpression(lexer *lex.Lexer) (ast.Node, error) {
 	opStack, outQueue := []lex.Token{}, []lex.Token{}
 
 	token, err := nextToken(lexer, EXPR_TOKEN_TYPES)
 	if err != nil {
-		return Node{}, err
+		return ast.Node{}, err
 	}
 
 	for {
@@ -129,7 +97,7 @@ func ParseExpression(lexer *lex.Lexer) (Node, error) {
 
 		token, err = lexer.Peek()
 		if err != nil {
-			return Node{}, err
+			return ast.Node{}, err
 		}
 		if !contains(token.TokenType, EXPR_TOKEN_TYPES) {
 			break
@@ -147,12 +115,12 @@ func ParseExpression(lexer *lex.Lexer) (Node, error) {
 	//}
 
 	//convert reverse polish notation into AST
-	var nodeStack []Node
+	var nodeStack []ast.Node
 	for _, token := range outQueue {
 		switch token.TokenType {
 		case lex.TOKEN_TYPE_NUMBER:
-			nodeStack = append(nodeStack, Node{
-				NodeType: NODE_TYPE_NUMBER,
+			nodeStack = append(nodeStack, ast.Node{
+				NodeType: ast.NODE_TYPE_NUMBER,
 				Children: nil,
 				Token:    token,
 			})
@@ -163,20 +131,20 @@ func ParseExpression(lexer *lex.Lexer) (Node, error) {
 				case "++", "--", "**":
 					child := nodeStack[len(nodeStack)-1]
 					nodeStack = nodeStack[:len(nodeStack)-1]
-					nodeStack = append(nodeStack, Node{
-						NodeType: NODE_TYPE_UNOP,
-						Children: []Node{child},
+					nodeStack = append(nodeStack, ast.Node{
+						NodeType: ast.NODE_TYPE_UNOP,
+						Children: []ast.Node{child},
 						Token:    token,
 					})
 				}
 			} else {
 
 				//pop 2 off of end
-				children := append([]Node(nil), nodeStack[len(nodeStack)-2:]...)
+				children := append([]ast.Node(nil), nodeStack[len(nodeStack)-2:]...)
 				nodeStack = nodeStack[0 : len(nodeStack)-2]
 
-				nodeStack = append(nodeStack, Node{
-					NodeType: NODE_TYPE_BINOP,
+				nodeStack = append(nodeStack, ast.Node{
+					NodeType: ast.NODE_TYPE_BINOP,
 					Children: children,
 					Token:    token,
 				})
@@ -188,7 +156,7 @@ func ParseExpression(lexer *lex.Lexer) (Node, error) {
 	}
 
 	if len(nodeStack) != 1 {
-		return Node{}, ExprError{
+		return ast.Node{}, ExprError{
 			Found:   outQueue[0],
 			Message: "Parsed multiple expressions",
 		}
@@ -197,11 +165,11 @@ func ParseExpression(lexer *lex.Lexer) (Node, error) {
 	return nodeStack[0], nil
 }
 
-func push[T lex.Token | Node](collection *[]T, tok T) {
+func push[T lex.Token | ast.Node](collection *[]T, tok T) {
 	*collection = append(*collection, tok)
 }
 
-func popStack[T lex.Token | Node](st *[]T) T {
+func popStack[T lex.Token | ast.Node](st *[]T) T {
 	if len(*st) == 0 {
 		panic("pop on empty stack")
 	}
@@ -210,7 +178,7 @@ func popStack[T lex.Token | Node](st *[]T) T {
 	return out
 }
 
-func peekStack[T lex.Token | Node](st []T) T {
+func peekStack[T lex.Token | ast.Node](st []T) T {
 	return st[len(st)-1]
 }
 
