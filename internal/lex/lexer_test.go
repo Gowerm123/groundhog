@@ -43,11 +43,11 @@ func TestLexExpr1(t *testing.T) {
 		{TokenType: TOKEN_TYPE_OP, Text: "/"},
 		{TokenType: TOKEN_TYPE_NUMBER, Text: "4"},
 		{TokenType: TOKEN_TYPE_OP, Text: "-"},
-		{TokenType: TOKEN_TYPE_LPAREN},
+		{TokenType: TOKEN_TYPE_LPAREN, Text: "("},
 		{TokenType: TOKEN_TYPE_NUMBER, Text: "10"},
 		{TokenType: TOKEN_TYPE_OP, Text: "+"},
 		{TokenType: TOKEN_TYPE_NUMBER, Text: "15"},
-		{TokenType: TOKEN_TYPE_RPAREN},
+		{TokenType: TOKEN_TYPE_RPAREN, Text: ")"},
 		{TokenType: TOKEN_TYPE_EOF},
 	}
 
