@@ -3,6 +3,7 @@ package eval
 import (
 	"awesomeProject/internal/lex"
 	"awesomeProject/internal/parse"
+	"fmt"
 	"testing"
 )
 
@@ -40,5 +41,24 @@ func TestExpr3(t *testing.T) {
 	found := doEval(text, t)
 	if expected != int(found) {
 		t.Fatalf("\n%s == %d\n%s != %f", text, expected, text, found)
+	}
+}
+
+func TestExpr4(t *testing.T) {
+	text := "1.0 + 3.5"
+	expected := 4.5
+	found := doEval(text, t)
+	if expected != found {
+		t.Fatalf("\n%s == %f\n%s != %f", text, expected, text, found)
+	}
+}
+
+func TestExpr5(t *testing.T) {
+	text := "1 + 2.5*(3 - 9.2)"
+	expected := 1 + 2.5*(3-9.2)
+	found := doEval(text, t)
+	if expected != found {
+		fmt.Println(expected, found)
+		t.Fatalf("\n%s == %f\n%s != %f", text, expected, text, found)
 	}
 }
