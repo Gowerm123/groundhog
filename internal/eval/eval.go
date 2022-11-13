@@ -3,20 +3,21 @@ package eval
 import (
 	"awesomeProject/internal/ast"
 	"fmt"
+	"math"
 	"strconv"
 )
 
 type eval struct {
-	result int
+	result float64
 }
 
 func (e *eval) VisitNumber(parent *ast.Node, number *ast.Node) {
-	result, err := strconv.ParseInt(number.Token.Text, 10, 32)
+	result, err := strconv.ParseFloat(number.Token.Text, 64)
 	if err != nil {
 		panic(err)
 	}
 
-	e.result = int(result)
+	e.result = result
 }
 
 func (e *eval) VisitBinop(parent *ast.Node, op *ast.Node) {
@@ -32,9 +33,17 @@ func (e *eval) VisitBinop(parent *ast.Node, op *ast.Node) {
 		e.result = left * right
 	case "/":
 		e.result = left / right
+	case "**":
+		e.result = pow(left, right)
 	default:
 		panic(fmt.Sprintf("Don't know how to eval op (%s)", op.Token.Text))
 	}
+}
+
+func pow[T int | float64](base T, pow T) T {
+	val := math.Pow(float64(base), float64(pow))
+
+	return T(val)
 }
 
 func (e *eval) VisitUnop(parent *ast.Node, op *ast.Node) {
@@ -48,7 +57,7 @@ func (e *eval) VisitUnop(parent *ast.Node, op *ast.Node) {
 	}
 }
 
-func EvalExpression(expr *ast.Node) int {
+func EvalExpression(expr *ast.Node) float64 {
 	var eval eval
 	expr.Visit(nil, &eval)
 

@@ -128,7 +128,7 @@ func ParseExpression(lexer *lex.Lexer) (ast.Node, error) {
 			//only binary operators right now
 			if len(nodeStack) < 2 {
 				switch token.Text {
-				case "++", "--", "**":
+				case "++", "--":
 					child := nodeStack[len(nodeStack)-1]
 					nodeStack = nodeStack[:len(nodeStack)-1]
 					nodeStack = append(nodeStack, ast.Node{
@@ -138,7 +138,6 @@ func ParseExpression(lexer *lex.Lexer) (ast.Node, error) {
 					})
 				}
 			} else {
-
 				//pop 2 off of end
 				children := append([]ast.Node(nil), nodeStack[len(nodeStack)-2:]...)
 				nodeStack = nodeStack[0 : len(nodeStack)-2]

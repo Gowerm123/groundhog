@@ -147,9 +147,16 @@ func (lexer *Lexer) nextNumber() (Token, error) {
 	}
 
 	digit := lexer.source.Peek()
-	for digit >= '0' && digit <= '9' {
+	if digit == '.' {
+		panic("leading periods not supported for numeric values")
+	}
+	isFirstPeriod := true
+	for digit >= '0' && digit <= '9' || (digit == '.' && isFirstPeriod) {
 		str.WriteRune(lexer.source.Next())
 		digit = lexer.source.Peek()
+		if digit == '.' {
+			isFirstPeriod = true
+		}
 	}
 
 	token.Text = str.String()
@@ -168,7 +175,7 @@ func (lexer *Lexer) Next() (Token, error) {
 	switch lexer.source.Peek() {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		return lexer.nextNumber()
-	case '+', '-', '*':
+	case '+', '-':
 		col := lexer.source.col
 		line := lexer.source.line
 		first := lexer.source.Next()
@@ -188,6 +195,25 @@ func (lexer *Lexer) Next() (Token, error) {
 				Text:      string(first),
 			}, nil
 		}
+	case '*':
+		col := lexer.source.col
+		line := lexer.source.line
+		sym := lexer.source.Next()
+		if lexer.source.Peek() == sym {
+			lexer.source.Next()
+			return Token{
+				TokenType: TOKEN_TYPE_OP,
+				Col:       col,
+				Line:      line,
+				Text:      string([]rune{sym, sym}),
+			}, nil
+		}
+		return Token{
+			TokenType: TOKEN_TYPE_OP,
+			Col:       col,
+			Line:      line,
+			Text:      string([]rune{sym}),
+		}, nil
 	case '/':
 		return Token{
 			TokenType: TOKEN_TYPE_OP,

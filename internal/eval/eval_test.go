@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func doEval(text string, t *testing.T) int {
+func doEval(text string, t *testing.T) float64 {
 	lexer := lex.NewLexer(lex.NewSource(text))
 	node, err := parse.Parse(&lexer)
 	if err != nil {
@@ -20,8 +20,8 @@ func TestExpr1(t *testing.T) {
 	text := "4 + 3 * 2 / 2"
 	expected := 4 + 3*2/2
 	found := doEval(text, t)
-	if expected != found {
-		t.Fatalf("\n%s == %d\n%s != %d", text, expected, text, found)
+	if expected != int(found) {
+		t.Fatalf("\n%s == %d\n%s != %f", text, expected, text, found)
 	}
 }
 
@@ -29,8 +29,8 @@ func TestExpr2(t *testing.T) {
 	text := "2 / 2 * 3 + 4"
 	expected := 2/2*3 + 4
 	found := doEval(text, t)
-	if expected != found {
-		t.Fatalf("\n%s == %d\n%s != %d", text, expected, text, found)
+	if expected != int(found) {
+		t.Fatalf("\n%s == %d\n%s != %f", text, expected, text, found)
 	}
 }
 
@@ -38,7 +38,7 @@ func TestExpr3(t *testing.T) {
 	text := "1 + 21 *3/4 - (10+ 15)"
 	expected := 1 + 21*3/4 - (10 + 15)
 	found := doEval(text, t)
-	if expected != found {
-		t.Fatalf("\n%s == %d\n%s != %d", text, expected, text, found)
+	if expected != int(found) {
+		t.Fatalf("\n%s == %d\n%s != %f", text, expected, text, found)
 	}
 }

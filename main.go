@@ -17,5 +17,5 @@ func main() {
 		panic(err)
 	}
 
-	println(fmt.Sprintf("= %d", eval.EvalExpression(&ast)))
+	println(fmt.Sprintf("= %f", eval.EvalExpression(&ast)))
 }
