@@ -5,6 +5,33 @@ import (
 	"testing"
 )
 
+func TestLexExpr2(t *testing.T) {
+	lexer := NewLexer(NewSource("++1+2-- -1"))
+	expected := []Token{
+		{TokenType: TOKEN_TYPE_OP, Text: "++"},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "1"},
+		{TokenType: TOKEN_TYPE_OP, Text: "+"},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "2"},
+		{TokenType: TOKEN_TYPE_OP, Text: "--"},
+		{TokenType: TOKEN_TYPE_OP, Text: "-"},
+		{TokenType: TOKEN_TYPE_NUMBER, Text: "1"},
+		{TokenType: TOKEN_TYPE_EOF},
+	}
+
+	for _, check := range expected {
+		token, err := lexer.Next()
+		if err != nil {
+			t.Error(err)
+			t.FailNow()
+		}
+
+		fmt.Printf("%s\n", token)
+		if token.TokenType != check.TokenType || token.Text != check.Text {
+			t.Fatalf("%s != %s or '%s' != '%s'", token.TokenType, check.TokenType, token.Text, check.Text)
+		}
+	}
+}
+
 func TestLexExpr1(t *testing.T) {
 	lexer := NewLexer(NewSource("1 + 21 *3/4 - (10+ 15)"))
 	expected := []Token{
