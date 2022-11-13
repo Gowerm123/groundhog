@@ -168,7 +168,7 @@ func (lexer *Lexer) Next() (Token, error) {
 	switch lexer.source.Peek() {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		return lexer.nextNumber()
-	case '+', '-':
+	case '+', '-', '*':
 		col := lexer.source.col
 		line := lexer.source.line
 		first := lexer.source.Next()
@@ -188,7 +188,7 @@ func (lexer *Lexer) Next() (Token, error) {
 				Text:      string(first),
 			}, nil
 		}
-	case '*', '/':
+	case '/':
 		return Token{
 			TokenType: TOKEN_TYPE_OP,
 			Col:       lexer.source.col,

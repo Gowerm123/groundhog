@@ -1,7 +1,7 @@
 package printer
 
 import (
-	"awesomeProject/internal/parse"
+	"awesomeProject/internal/ast"
 	"strings"
 )
 
@@ -9,11 +9,11 @@ type stringer struct {
 	buf strings.Builder
 }
 
-func (s *stringer) VisitNumber(parent *parse.Node, number *parse.Node) {
+func (s *stringer) VisitNumber(parent *ast.Node, number *ast.Node) {
 	s.buf.WriteString(number.Token.Text)
 }
 
-func (s *stringer) VisitBinop(parent *parse.Node, op *parse.Node) {
+func (s *stringer) VisitBinop(parent *ast.Node, op *ast.Node) {
 	s.buf.WriteRune('(')
 	op.Children[0].Visit(op, s)
 	s.buf.WriteRune(' ')
@@ -23,11 +23,11 @@ func (s *stringer) VisitBinop(parent *parse.Node, op *parse.Node) {
 	s.buf.WriteRune(')')
 }
 
-func (s *stringer) VisitUnop(parent *parse.Node, op *parse.Node) {
-	
+func (s *stringer) VisitUnop(parent *ast.Node, op *ast.Node) {
+
 }
 
-func String(node *parse.Node) string {
+func String(node *ast.Node) string {
 	var toString stringer
 	node.Visit(nil, &toString)
 
