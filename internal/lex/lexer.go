@@ -168,7 +168,27 @@ func (lexer *Lexer) Next() (Token, error) {
 	switch lexer.source.Peek() {
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		return lexer.nextNumber()
-	case '+', '-', '*', '/':
+	case '+', '-':
+		col := lexer.source.col
+		line := lexer.source.line
+		first := lexer.source.Next()
+		next := lexer.source.Peek() //peek without ignoring whitespace
+		if next == first {
+			return Token{
+				TokenType: TOKEN_TYPE_OP,
+				Col:       col,
+				Line:      line,
+				Text:      string([]rune{first, lexer.source.Next()}),
+			}, nil
+		} else {
+			return Token{
+				TokenType: TOKEN_TYPE_OP,
+				Col:       col,
+				Line:      line,
+				Text:      string(first),
+			}, nil
+		}
+	case '*', '/':
 		return Token{
 			TokenType: TOKEN_TYPE_OP,
 			Col:       lexer.source.col,
